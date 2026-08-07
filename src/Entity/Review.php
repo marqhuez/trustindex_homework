@@ -15,7 +15,7 @@ class Review
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::SMALLINT)]
     #[Assert\NotNull]
     #[Assert\Range(min: 1, max: 5)]
     private ?int $rating = null;
