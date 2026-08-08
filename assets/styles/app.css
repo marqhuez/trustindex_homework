@@ -1,5 +1,22 @@
 @import "tailwindcss";
 
+@theme {
+    --font-display: "Fraunces", ui-serif, Georgia, serif;
+    --font-body: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+    --color-paper: #F5F7F3;
+    --color-paper-deep: #E7ECE5;
+    --color-ink: #16281F;
+    --color-ink-soft: #52604F;
+    --color-emerald: #1F6F54;
+    --color-emerald-dark: #14503C;
+    --color-gold: #C8933C;
+    --color-rust: #B3492D;
+}
+
 body {
-    background-color: skyblue;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
 }

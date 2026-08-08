@@ -35,7 +35,6 @@ final class ReviewController extends AbstractController
         }
 
         return $this->render('review/index.html.twig', [
-            'controller_name' => 'ReviewController',
             'form' => $form,
         ]);
     }
