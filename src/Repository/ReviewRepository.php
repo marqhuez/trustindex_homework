@@ -16,7 +16,7 @@ class ReviewRepository extends ServiceEntityRepository
         parent::__construct($registry, Review::class);
     }
 
-    public function findPageNewestFirst(int $offset, int $limit): array
+    public function findPageNewestFirst(int $limit, int $offset): array
     {
         return $this->createQueryBuilder('r')
             ->addSelect('c')

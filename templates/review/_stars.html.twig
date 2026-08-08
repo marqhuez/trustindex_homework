@@ -1,0 +1,8 @@
+{% set rating = rating|default(0) %}
+<div class="flex items-center gap-0.5" role="img" aria-label="{{ rating }} out of 5 stars">
+    {% for i in 1..5 %}
+        <svg viewBox="0 0 24 24" class="h-4 w-4 {{ i <= rating ? 'text-gold' : 'text-ink/15' }}" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.8l7.1-.7z"/>
+        </svg>
+    {% endfor %}
+</div>

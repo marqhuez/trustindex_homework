@@ -14,17 +14,17 @@ final class MainPageController extends AbstractController
     public function index(Request $request, ReviewRepository $reviewRepository): Response
     {
         $limit = 10;
-        $offset = max(0, $request->query->getInt('offset', 0));
+        $totalPages = max(1, (int) ceil($reviewRepository->count([]) / $limit));
 
-        $reviews = $reviewRepository->findPageNewestFirst($offset, $limit + 1);
-        $hasNextPage = count($reviews) > $limit;
-        $reviews = array_slice($reviews, 0, $limit);
+        $page = $request->query->getInt('page', 1);
+        $page = max(1, min($page, $totalPages));
+
+        $reviews = $reviewRepository->findPageNewestFirst($limit, offset: ($page - 1) * $limit);
 
         return $this->render('main_page/index.html.twig', [
             'reviews' => $reviews,
-            'offset' => $offset,
-            'limit' => $limit,
-            'hasNextPage' => $hasNextPage,
+            'page' => $page,
+            'totalPages' => $totalPages,
         ]);
     }
 }

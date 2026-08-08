@@ -21,7 +21,7 @@
         <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
         {% endif %}
     </head>
-    <body class="min-h-screen bg-paper font-body text-ink antialiased">
+    <body class="h-screen overflow-hidden bg-paper font-body text-ink antialiased">
         <div class="pointer-events-none fixed top-4 right-4 z-50 flex flex-col items-end gap-2">
             {% for label, messages in app.flashes() %}
                 {% for message in messages %}
@@ -37,30 +37,34 @@
             {% endfor %}
         </div>
 
-        <header class="sticky top-0 z-40 border-b border-paper-deep bg-white/90 backdrop-blur">
-            <div class="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
-                <a href="{{ path('app_main_page') }}"
-                   class="flex items-center gap-2 font-mono text-xs tracking-widest text-ink-soft uppercase transition-colors hover:text-emerald">
-                    <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M3 11l9-7 9 7"/>
-                        <path d="M5 10v9a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1v-9"/>
-                    </svg>
-                    Home
-                </a>
-
-                <nav class="flex items-center gap-6 font-mono text-xs tracking-widest uppercase">
-                    <span class="cursor-not-allowed text-ink-soft/40" title="Coming soon" aria-disabled="true">
-                        Companies
-                    </span>
-
-                    <a href="{{ path('app_review') }}"
-                       class="rounded-full bg-emerald px-6 py-2.5 text-sm font-medium text-paper normal-case tracking-normal transition-colors hover:bg-emerald-dark focus:outline-none focus:ring-2 focus:ring-emerald focus:ring-offset-2 focus:ring-offset-white">
-                        Send new review
+        <div id="page" class="flex h-full flex-col overflow-hidden">
+            <header class="z-40 flex-none border-b border-paper-deep bg-white/90 backdrop-blur">
+                <div class="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
+                    <a href="{{ path('app_main_page') }}"
+                       class="flex items-center gap-2 font-mono text-xs tracking-widest text-ink-soft uppercase transition-colors hover:text-emerald">
+                        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 11l9-7 9 7"/>
+                            <path d="M5 10v9a1 1 0 0 0 1 1h3v-6h6v6h3a1 1 0 0 0 1-1v-9"/>
+                        </svg>
+                        Home
                     </a>
-                </nav>
-            </div>
-        </header>
 
-        {% block body %}{% endblock %}
+                    <nav class="flex items-center gap-6 font-mono text-xs tracking-widest uppercase">
+                        <span class="cursor-not-allowed text-ink-soft/40" title="Coming soon" aria-disabled="true">
+                            Companies
+                        </span>
+
+                        <a href="{{ path('app_review') }}"
+                           class="rounded-full bg-emerald px-6 py-2.5 text-sm font-medium text-paper normal-case tracking-normal transition-colors hover:bg-emerald-dark focus:outline-none focus:ring-2 focus:ring-emerald focus:ring-offset-2 focus:ring-offset-white">
+                            Send new review
+                        </a>
+                    </nav>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
     </body>
 </html>

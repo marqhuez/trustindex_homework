@@ -1,0 +1,15 @@
+{% set text = review.reviewText %}
+<li class="rounded-2xl border border-paper-deep bg-white p-8 shadow-sm shadow-ink/5">
+    <div class="flex items-center justify-between gap-4">
+        <span class="font-medium text-ink">{{ review.company.name }}</span>
+        {{ include('review/_stars.html.twig', { rating: review.rating }) }}
+    </div>
+
+    <p class="mt-4 text-sm leading-relaxed text-ink-soft">
+        {{ text|length > 120 ? text|slice(0, 120) ~ '…' : text }}
+    </p>
+
+    <time datetime="{{ review.createdAt|date('c') }}" class="mt-4 block font-mono text-xs tracking-widest text-ink-soft/70 uppercase">
+        {{ review.createdAt|date('Y.m.d.') }}
+    </time>
+</li>
