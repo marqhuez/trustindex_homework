@@ -29,6 +29,19 @@ composer install
 
 ### Database
 
+Copy `.env` to `.env.local` and set the local DB credentials (matching `compose.yaml`'s MySQL container):
+
+```bash
+cp .env .env.local
+```
+
+```dotenv
+# by default
+DATABASE_URL="mysql://root:app@127.0.0.1:3306/app?serverVersion=8.0.32&charset=utf8mb4"
+```
+
+`.env.local` is gitignored — it's meant for local overrides and is never committed.
+
 Start MySQL via Docker:
 
 ```bash
@@ -46,7 +59,7 @@ php bin/console doctrine:migrations:migrate
 
 ```bash
 php bin/console tailwind:build
-# while developing:
+# during developement:
 php bin/console tailwind:build --watch
 ```
 
