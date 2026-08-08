@@ -63,7 +63,7 @@ final class ReviewControllerTest extends WebTestCase
 
         self::assertResponseRedirects('/');
         $client->followRedirect();
-        self::assertSelectorTextContains('body', 'Review submitted successfully!');
+        self::assertSelectorTextContains('body', 'Thank you for your review!');
 
         $reviewRepository = static::getContainer()->get(ReviewRepository::class);
         $persisted = $reviewRepository->findOneBy(['authorEmail' => 'functional-test@example.com']);

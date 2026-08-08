@@ -63,7 +63,7 @@ final class ReviewController extends AbstractController
 
                 $this->addFlash('success', $review->isFlagged()
                     ? 'Thanks! Your review is pending moderation.'
-                    : 'Review submitted successfully!');
+                    : 'Thank you for your review!');
 
                 return $this->redirectToRoute('app_review_index');
             } catch (\Throwable $e) {
