@@ -19,7 +19,7 @@
     {% else %}
         <ul class="mt-10 flex flex-col gap-6">
             {% for review in reviews %}
-                {{ include('review/_review_card.html.twig', { review: review }) }}
+                {{ include('review/_review_card.html.twig', { review: review, page: page }) }}
             {% endfor %}
         </ul>
 

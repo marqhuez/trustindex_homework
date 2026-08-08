@@ -1,6 +1,7 @@
 {% set text = review.reviewText %}
+{% set showParams = page is defined and page > 1 ? { id: review.id, fromPage: page } : { id: review.id } %}
 <li>
-    <a href="{{ path('app_review_show', { id: review.id }) }}"
+    <a href="{{ path('app_review_show', showParams) }}"
        class="block rounded-2xl border border-paper-deep bg-white p-8 shadow-sm shadow-ink/5 transition-colors hover:border-emerald">
         <div class="flex items-center justify-between gap-4">
             <span class="font-medium text-ink">{{ review.company.name }}</span>
