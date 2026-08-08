@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Review;
 use App\Form\ReviewType;
+use App\Repository\CompanyRepository;
 use App\Repository\ReviewRepository;
 use App\Service\ReviewService;
 use Psr\Log\LoggerInterface;
@@ -36,9 +37,14 @@ final class ReviewController extends AbstractController
     }
 
     #[Route('/reviews/new', name: 'app_review_new')]
-    public function new(Request $request, ReviewService $reviewService, LoggerInterface $logger): Response
+    public function new(Request $request, ReviewService $reviewService, CompanyRepository $companyRepository, LoggerInterface $logger): Response
     {
         $review = new Review();
+
+        $companyId = $request->query->getInt('company');
+        if ($companyId > 0) {
+            $review->setCompany($companyRepository->find($companyId));
+        }
 
         $form = $this->createForm(ReviewType::class, $review);
         $form->handleRequest($request);
