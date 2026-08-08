@@ -26,7 +26,7 @@ final class ReviewController extends AbstractController
                 $reviewService->saveNew($review);
                 $this->addFlash('success', 'Review submitted successfully!');
 
-                return $this->redirectToRoute('/');
+                return $this->redirectToRoute('app_review');
             } catch (Exception $e) {
                 $this->addFlash('error', 'An error occurred while saving the review: ' . $e->getMessage());
             }
