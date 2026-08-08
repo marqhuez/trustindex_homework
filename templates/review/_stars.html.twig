@@ -2,17 +2,22 @@
 {% set size = size|default('h-4 w-4') %}
 <div class="flex items-center gap-0.5" role="img" aria-label="{{ rating }} out of 5 stars">
     {% for i in 1..5 %}
-        {% set fill = rating - (i - 1) %}
-        {% set fillPercent = (fill < 0 ? 0 : (fill > 1 ? 1 : fill)) * 100 %}
-        <span class="relative inline-block {{ size }}">
-            <svg viewBox="0 0 24 24" class="absolute inset-0 h-full w-full text-ink/15" fill="currentColor" aria-hidden="true">
+        {% set fillPercent = min(max(rating - (i - 1), 0), 1) * 100 %}
+        {% if fillPercent == 0 or fillPercent == 100 %}
+            <svg viewBox="0 0 24 24" class="{{ size }} {{ fillPercent == 100 ? 'text-gold' : 'text-ink/15' }}" fill="currentColor" aria-hidden="true">
                 <path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.8l7.1-.7z"/>
             </svg>
-            <span class="absolute top-0 left-0 h-full overflow-hidden" style="width: {{ fillPercent|round }}%">
-                <svg viewBox="0 0 24 24" class="{{ size }} shrink-0 text-gold" fill="currentColor" aria-hidden="true">
+        {% else %}
+            <span class="relative inline-block {{ size }}">
+                <svg viewBox="0 0 24 24" class="absolute inset-0 h-full w-full text-ink/15" fill="currentColor" aria-hidden="true">
                     <path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.8l7.1-.7z"/>
                 </svg>
+                <span class="absolute top-0 left-0 h-full overflow-hidden" style="width: {{ fillPercent|round }}%">
+                    <svg viewBox="0 0 24 24" class="{{ size }} shrink-0 text-gold" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2.5l2.9 6.6 7.1.7-5.4 4.8 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.8l7.1-.7z"/>
+                    </svg>
+                </span>
             </span>
-        </span>
+        {% endif %}
     {% endfor %}
 </div>

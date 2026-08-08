@@ -13,9 +13,11 @@
     </p>
 
     {% if reviews is empty %}
-        <p class="mt-10 rounded-2xl border border-paper-deep bg-white p-8 text-sm text-ink-soft shadow-sm shadow-ink/5">
-            No reviews yet — <a href="{{ path('app_review_new') }}" class="text-emerald hover:text-emerald-dark">be the first to leave one</a>.
-        </p>
+        {% embed '_empty_state.html.twig' %}
+            {% block message %}
+                No reviews yet — <a href="{{ path('app_review_new') }}" class="text-emerald hover:text-emerald-dark">be the first to leave one</a>.
+            {% endblock %}
+        {% endembed %}
     {% else %}
         <ul class="mt-10 flex flex-col gap-6">
             {% for review in reviews %}

@@ -13,9 +13,11 @@
     </p>
 
     {% if stats is empty %}
-        <p class="mt-10 rounded-2xl border border-paper-deep bg-white p-8 text-sm text-ink-soft shadow-sm shadow-ink/5">
-            No companies yet — <a href="{{ path('app_review_new') }}" class="text-emerald hover:text-emerald-dark">be the first to leave a review</a>.
-        </p>
+        {% embed '_empty_state.html.twig' %}
+            {% block message %}
+                No companies yet — <a href="{{ path('app_review_new') }}" class="text-emerald hover:text-emerald-dark">be the first to leave a review</a>.
+            {% endblock %}
+        {% endembed %}
     {% else %}
         <ul class="mt-10 grid gap-6 sm:grid-cols-2">
             {% for stat in stats %}

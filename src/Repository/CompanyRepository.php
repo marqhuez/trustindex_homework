@@ -22,21 +22,12 @@ class CompanyRepository extends ServiceEntityRepository
      */
     public function findAllWithReviewStats(): array
     {
-        $rows = $this->createQueryBuilder('c')
-            ->select('c', 'COUNT(r.id) AS reviewCount', 'AVG(r.rating) AS averageRating')
+        return $this->createQueryBuilder('c')
+            ->select(sprintf('NEW %s(c, COUNT(r.id), AVG(r.rating))', CompanyStats::class))
             ->leftJoin('c.reviews', 'r')
             ->groupBy('c.id')
-            ->orderBy('averageRating', 'DESC')
+            ->orderBy('AVG(r.rating)', 'DESC')
             ->getQuery()
             ->getResult();
-
-        return array_map(
-            fn(array $row) => new CompanyStats(
-                company: $row[0],
-                reviewCount: (int) $row['reviewCount'],
-                averageRating: $row['averageRating'] !== null ? (float) $row['averageRating'] : null,
-            ),
-            $rows,
-        );
     }
 }
