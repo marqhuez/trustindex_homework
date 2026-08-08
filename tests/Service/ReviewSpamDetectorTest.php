@@ -44,7 +44,6 @@ final class ReviewSpamDetectorTest extends TestCase
 
     public function testShortAllCapsTextIsNotFlagged(): void
     {
-        // a short, enthusiastic review shouldn't trip the caps check just for being brief
         $detector = $this->detectorWithNoRecentSubmissions();
 
         self::assertFalse($detector->isSpam(
@@ -75,6 +74,20 @@ final class ReviewSpamDetectorTest extends TestCase
         self::assertTrue($detector->isSpam(
             'Another completely normal review, nothing suspicious here.',
             'repeat.poster@example.com',
+            $this->existingCompany(),
+        ));
+    }
+
+    public function testBrandNewCompanySkipsTheDuplicateCheckQuery(): void
+    {
+        $reviewRepository = $this->createMock(ReviewRepository::class);
+        $reviewRepository->expects(self::never())->method('hasRecentSubmission');
+
+        $detector = new ReviewSpamDetector($reviewRepository);
+
+        self::assertFalse($detector->isSpam(
+            'A perfectly normal review for a brand new company.',
+            'new.company.reviewer@example.com',
             new Company(),
         ));
     }
@@ -85,5 +98,15 @@ final class ReviewSpamDetectorTest extends TestCase
         $reviewRepository->method('hasRecentSubmission')->willReturn(false);
 
         return new ReviewSpamDetector($reviewRepository);
+    }
+
+    private function existingCompany(int $id = 1): Company
+    {
+        $company = new Company();
+
+        $property = new \ReflectionProperty(Company::class, 'id');
+        $property->setValue($company, $id);
+
+        return $company;
     }
 }

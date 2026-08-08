@@ -63,6 +63,10 @@ final class ReviewSpamDetector
 
     private function isDuplicateSubmission(string $authorEmail, Company $company): bool
     {
+        if ($company->getId() === null) {
+            return false;
+        }
+
         return $this->reviewRepository->hasRecentSubmission(
             $authorEmail,
             $company,

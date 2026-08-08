@@ -72,6 +72,55 @@ final class CompanyRepositoryTest extends KernelTestCase
         self::assertNull($statsByName['No Reviews Co']->averageRating);
     }
 
+    public function testFlaggedReviewsAreExcludedFromCountAndAverageButCompanyStillAppears(): void
+    {
+        $company = $this->createCompany('Flagged Only Co');
+        $flaggedReview = new Review();
+        $flaggedReview->setCompany($company);
+        $flaggedReview->setRating(1);
+        $flaggedReview->setReviewText('This should not count toward the average.');
+        $flaggedReview->setAuthorEmail('reviewer@example.com');
+        $flaggedReview->setCreatedAt(new \DateTimeImmutable());
+        $flaggedReview->setUpdatedAt(new \DateTimeImmutable());
+        $flaggedReview->setFlagged(true);
+        $this->entityManager->persist($flaggedReview);
+
+        $this->entityManager->flush();
+
+        $statsByName = [];
+        foreach ($this->companyRepository->findAllWithReviewStats() as $stat) {
+            $statsByName[$stat->company->getName()] = $stat;
+        }
+
+        self::assertArrayHasKey('Flagged Only Co', $statsByName, 'a company whose only review is flagged must still appear');
+        self::assertSame(0, $statsByName['Flagged Only Co']->reviewCount);
+        self::assertNull($statsByName['Flagged Only Co']->averageRating);
+    }
+
+    public function testSearchMatchesCaseInsensitiveSubstring(): void
+    {
+        $this->createCompany('Acme Corporation');
+        $this->createCompany('Beta Industries');
+        $this->entityManager->flush();
+
+        $results = $this->companyRepository->search('acme');
+
+        self::assertCount(1, $results);
+        self::assertSame('Acme Corporation', $results[0]->getName());
+    }
+
+    public function testSearchRespectsTheLimit(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $this->createCompany('Limited Co ' . $i);
+        }
+        $this->entityManager->flush();
+
+        $results = $this->companyRepository->search('Limited Co', limit: 3);
+
+        self::assertCount(3, $results);
+    }
+
     private function createCompany(string $name): Company
     {
         $company = new Company();
