@@ -4,6 +4,7 @@ services:
         restart: always
         environment:
             MYSQL_ROOT_PASSWORD: "app"
+            MYSQL_DATABASE: "app"
             TZ: "Europe/Budapest"
         ports:
             - "3306:3306"
