@@ -7,7 +7,9 @@ use App\Repository\CompanyRepository;
 
 final class CompanyResolver
 {
-    public function __construct(private readonly CompanyRepository $companyRepository) {}
+    public function __construct(private readonly CompanyRepository $companyRepository)
+    {
+    }
 
     public function findOrCreateByName(string $name): Company
     {

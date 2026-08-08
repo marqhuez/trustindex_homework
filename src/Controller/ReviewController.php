@@ -13,7 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Throwable;
 
 final class ReviewController extends AbstractController
 {
@@ -49,7 +48,7 @@ final class ReviewController extends AbstractController
         $companyId = $request->query->getInt('company');
         if ($companyId > 0) {
             $company = $companyRepository->find($companyId);
-            if ($company !== null) {
+            if (null !== $company) {
                 $dto->companyName = $company->getName();
             }
         }
@@ -67,8 +66,8 @@ final class ReviewController extends AbstractController
                     : 'Review submitted successfully!');
 
                 return $this->redirectToRoute('app_review_index');
-            } catch (Throwable $e) {
-                $logger->error('Error saving review: ' . $e->getMessage());
+            } catch (\Throwable $e) {
+                $logger->error('Error saving review', ['exception' => $e]);
                 $this->addFlash('error', 'An error occurred while saving the review');
             }
         }
@@ -81,6 +80,12 @@ final class ReviewController extends AbstractController
     #[Route('/reviews/{id}', name: 'app_review_show', requirements: ['id' => '\d+'])]
     public function show(Review $review, Request $request): Response
     {
+        // flagged reviews are hidden from the listing and company stats pending moderation —
+        // reachable-by-id would defeat that, so treat them as not found here too
+        if ($review->isFlagged()) {
+            throw $this->createNotFoundException();
+        }
+
         $fromPage = max(1, $request->query->getInt('fromPage', 1));
 
         return $this->render('review/show.html.twig', [

@@ -10,5 +10,6 @@ final readonly class CompanyStats
         public Company $company,
         public int $reviewCount,
         public ?float $averageRating,
-    ) {}
+    ) {
+    }
 }

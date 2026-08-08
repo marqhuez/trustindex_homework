@@ -4,7 +4,7 @@ namespace App\Form\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class CreateReviewRequest
+final class CreateReviewRequest
 {
     #[Assert\NotBlank]
     #[Assert\Length(max: 255)]

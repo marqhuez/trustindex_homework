@@ -17,7 +17,7 @@ final class CompanyController extends AbstractController
     {
         $search = trim($request->query->get('q', ''));
         $context = [
-            'stats' => $companyRepository->findAllWithReviewStats($search !== '' ? $search : null),
+            'stats' => $companyRepository->findAllWithReviewStats('' !== $search ? $search : null),
             'search' => $search,
         ];
 
@@ -34,12 +34,12 @@ final class CompanyController extends AbstractController
     {
         $query = trim($request->query->get('q', ''));
 
-        if ($query === '') {
+        if ('' === $query) {
             return $this->json([]);
         }
 
         return $this->json(array_map(
-            static fn(Company $company) => ['id' => $company->getId(), 'name' => $company->getName()],
+            static fn (Company $company) => ['id' => $company->getId(), 'name' => $company->getName()],
             $companyRepository->search($query),
         ));
     }

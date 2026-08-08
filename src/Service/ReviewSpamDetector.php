@@ -12,7 +12,7 @@ final class ReviewSpamDetector
         'fuck',
         'shit',
         'bitch',
-        'casino'
+        'casino',
         // add more banned words as needed
     ];
 
@@ -20,7 +20,9 @@ final class ReviewSpamDetector
     private const int MIN_LENGTH_FOR_CAPS_CHECK = 20;
     private const string DUPLICATE_WINDOW = 'PT1H';
 
-    public function __construct(private readonly ReviewRepository $reviewRepository) {}
+    public function __construct(private readonly ReviewRepository $reviewRepository)
+    {
+    }
 
     public function isSpam(string $reviewText, string $authorEmail, Company $company): bool
     {
@@ -63,7 +65,7 @@ final class ReviewSpamDetector
 
     private function isDuplicateSubmission(string $authorEmail, Company $company): bool
     {
-        if ($company->getId() === null) {
+        if (null === $company->getId()) {
             return false;
         }
 

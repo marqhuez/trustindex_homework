@@ -28,10 +28,10 @@ class CompanyRepository extends ServiceEntityRepository
             ->groupBy('c.id')
             ->orderBy('AVG(r.rating)', 'DESC');
 
-        if ($search !== null) {
+        if (null !== $search) {
             $queryBuilder
                 ->andWhere('LOWER(c.name) LIKE LOWER(:search)')
-                ->setParameter('search', '%' . $search . '%');
+                ->setParameter('search', '%'.$search.'%');
         }
 
         return $queryBuilder->getQuery()->getResult();
@@ -53,7 +53,7 @@ class CompanyRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('c')
             ->andWhere('LOWER(c.name) LIKE LOWER(:query)')
-            ->setParameter('query', '%' . $query . '%')
+            ->setParameter('query', '%'.$query.'%')
             ->orderBy('c.name', 'ASC')
             ->setMaxResults($limit)
             ->getQuery()

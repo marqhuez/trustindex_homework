@@ -111,8 +111,8 @@ final class CompanyRepositoryTest extends KernelTestCase
 
     public function testSearchRespectsTheLimit(): void
     {
-        for ($i = 0; $i < 5; $i++) {
-            $this->createCompany('Limited Co ' . $i);
+        for ($i = 0; $i < 5; ++$i) {
+            $this->createCompany('Limited Co '.$i);
         }
         $this->entityManager->flush();
 

@@ -27,11 +27,11 @@ final class ReviewIndexControllerTest extends WebTestCase
         $company->setName(self::TEST_COMPANY_NAME);
         $this->entityManager->persist($company);
 
-        for ($i = 0; $i < self::SEEDED_REVIEW_COUNT; $i++) {
+        for ($i = 0; $i < self::SEEDED_REVIEW_COUNT; ++$i) {
             $review = new Review();
             $review->setCompany($company);
             $review->setRating(5);
-            $review->setReviewText('Seeded review number ' . $i);
+            $review->setReviewText('Seeded review number '.$i);
             $review->setAuthorEmail(sprintf('pagination-test-%d@example.com', $i));
             $review->setCreatedAt(new \DateTimeImmutable());
             $review->setUpdatedAt(new \DateTimeImmutable());
@@ -46,7 +46,7 @@ final class ReviewIndexControllerTest extends WebTestCase
         $entityManager = static::getContainer()->get(EntityManagerInterface::class);
 
         $reviews = $entityManager->getRepository(Review::class)->findBy(['authorEmail' => array_map(
-            static fn(int $i) => sprintf('pagination-test-%d@example.com', $i),
+            static fn (int $i) => sprintf('pagination-test-%d@example.com', $i),
             range(0, self::SEEDED_REVIEW_COUNT - 1),
         )]);
         foreach ($reviews as $review) {
@@ -55,7 +55,7 @@ final class ReviewIndexControllerTest extends WebTestCase
         $entityManager->flush();
 
         $company = $entityManager->getRepository(Company::class)->findOneBy(['name' => self::TEST_COMPANY_NAME]);
-        if ($company !== null) {
+        if (null !== $company) {
             $entityManager->remove($company);
             $entityManager->flush();
         }

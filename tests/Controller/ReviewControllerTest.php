@@ -10,7 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class ReviewControllerTest extends WebTestCase
 {
-    private const array TEST_EMAILS = ['functional-test@example.com', 'not-an-email'];
+    private const array TEST_EMAILS = ['functional-test@example.com', 'not-an-email', 'spam-test@example.com'];
     private const string TEST_COMPANY_NAME = 'Functional Test Co';
 
     private KernelBrowser $client;
@@ -29,7 +29,7 @@ final class ReviewControllerTest extends WebTestCase
 
         foreach (self::TEST_EMAILS as $email) {
             $review = $reviewRepository->findOneBy(['authorEmail' => $email]);
-            if ($review !== null) {
+            if (null !== $review) {
                 $entityManager->remove($review);
             }
         }
@@ -37,7 +37,7 @@ final class ReviewControllerTest extends WebTestCase
 
         $companyRepository = static::getContainer()->get(CompanyRepository::class);
         $company = $companyRepository->findOneByNameIgnoreCase(self::TEST_COMPANY_NAME);
-        if ($company !== null) {
+        if (null !== $company) {
             $entityManager->remove($company);
             $entityManager->flush();
         }
@@ -100,5 +100,35 @@ final class ReviewControllerTest extends WebTestCase
         $this->client->request('GET', '/reviews/999999');
 
         self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testASpamTriggeringReviewIsFlaggedAndHiddenEverywhereEndToEnd(): void
+    {
+        $client = $this->client;
+
+        $crawler = $client->request('GET', '/reviews/new');
+
+        $form = $crawler->selectButton('Send review')->form([
+            'review[rating]' => '5',
+            'review[reviewText]' => 'Best CASINO bonuses ever, come play now!',
+            'review[authorEmail]' => 'spam-test@example.com',
+            'review[companyName]' => self::TEST_COMPANY_NAME,
+        ]);
+
+        $client->submit($form);
+
+        self::assertResponseRedirects('/');
+        $client->followRedirect();
+        self::assertSelectorTextContains('body', 'Thanks! Your review is pending moderation.');
+        self::assertSelectorTextNotContains('body', self::TEST_COMPANY_NAME);
+
+        $reviewRepository = static::getContainer()->get(ReviewRepository::class);
+        $persisted = $reviewRepository->findOneBy(['authorEmail' => 'spam-test@example.com']);
+
+        self::assertNotNull($persisted, 'a flagged review should still be persisted, not silently dropped');
+        self::assertTrue($persisted->isFlagged());
+
+        $client->request('GET', '/reviews/'.$persisted->getId());
+        self::assertResponseStatusCodeSame(404, 'a flagged review should not be viewable by id either');
     }
 }
