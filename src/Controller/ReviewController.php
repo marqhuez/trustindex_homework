@@ -23,7 +23,7 @@ final class ReviewController extends AbstractController
         // pagination logic kept in the controller since it's the only consumer.
         // if an API endpoint or console command needed the same listing, this would move into ReviewRepository (e.g. returning a PaginatedResult) to avoid duplication
         $limit = 10;
-        $totalPages = max(1, (int) ceil($reviewRepository->count([]) / $limit));
+        $totalPages = max(1, (int) ceil($reviewRepository->count(['flagged' => false]) / $limit));
 
         $page = $request->query->getInt('page', 1);
         $page = max(1, min($page, $totalPages));
@@ -59,9 +59,12 @@ final class ReviewController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $reviewService->saveNew($reviewService->createFromRequest($dto));
+                $review = $reviewService->createFromRequest($dto);
+                $reviewService->saveNew($review);
 
-                $this->addFlash('success', 'Review submitted successfully!');
+                $this->addFlash('success', $review->isFlagged()
+                    ? 'Thanks! Your review is pending moderation.'
+                    : 'Review submitted successfully!');
 
                 return $this->redirectToRoute('app_review_index');
             } catch (Throwable $e) {

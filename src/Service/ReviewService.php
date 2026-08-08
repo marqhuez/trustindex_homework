@@ -8,7 +8,11 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class ReviewService
 {
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly CompanyResolver $companyResolver) {}
+    public function __construct(
+        private readonly EntityManagerInterface $entityManager,
+        private readonly CompanyResolver $companyResolver,
+        private readonly ReviewSpamDetector $spamDetector,
+    ) {}
 
     public function saveNew(Review $review)
     {
@@ -23,11 +27,14 @@ class ReviewService
 
     public function createFromRequest(CreateReviewRequest $request): Review
     {
+        $company = $this->companyResolver->findOrCreateByName($request->companyName);
+
         $review = new Review();
-        $review->setCompany($this->companyResolver->findOrCreateByName($request->companyName));
+        $review->setCompany($company);
         $review->setRating($request->rating);
         $review->setReviewText($request->reviewText);
         $review->setAuthorEmail($request->authorEmail);
+        $review->setFlagged($this->spamDetector->isSpam($request->reviewText, $request->authorEmail, $company));
 
         return $review;
     }

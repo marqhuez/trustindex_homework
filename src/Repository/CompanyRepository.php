@@ -24,7 +24,7 @@ class CompanyRepository extends ServiceEntityRepository
     {
         $queryBuilder = $this->createQueryBuilder('c')
             ->select(sprintf('NEW %s(c, COUNT(r.id), AVG(r.rating))', CompanyStats::class))
-            ->leftJoin('c.reviews', 'r')
+            ->leftJoin('c.reviews', 'r', 'WITH', 'r.flagged = false')
             ->groupBy('c.id')
             ->orderBy('AVG(r.rating)', 'DESC');
 

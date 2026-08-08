@@ -40,6 +40,9 @@ class Review
     #[Assert\NotNull]
     private ?Company $company = null;
 
+    #[ORM\Column]
+    private bool $flagged = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -113,6 +116,18 @@ class Review
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    public function isFlagged(): bool
+    {
+        return $this->flagged;
+    }
+
+    public function setFlagged(bool $flagged): static
+    {
+        $this->flagged = $flagged;
 
         return $this;
     }
