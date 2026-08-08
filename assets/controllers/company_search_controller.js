@@ -1,35 +1,46 @@
 import { Controller } from '@hotwired/stimulus';
+import debounce from '../utils/debounce.js';
 
 export default class extends Controller {
     static targets = ['input', 'results'];
     static values = { url: String };
 
     connect() {
-        this.debounceTimer = null;
+        this.abortController = null;
+        this.debouncedSearch = debounce(() => this.fetchResults(), 250);
     }
 
     disconnect() {
-        clearTimeout(this.debounceTimer);
+        this.debouncedSearch.cancel();
+        this.abortController?.abort();
     }
 
     search() {
-        clearTimeout(this.debounceTimer);
-        this.debounceTimer = setTimeout(() => this.fetchResults(), 250);
+        this.debouncedSearch();
     }
 
     async fetchResults() {
-        const url = new URL(this.urlValue, window.location.origin);
-        url.searchParams.set('q', this.inputTarget.value.trim());
+        this.abortController?.abort();
+        this.abortController = new AbortController();
 
-        const response = await fetch(url, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        });
+        const query = this.inputTarget.value.trim();
+        const url = `${this.urlValue}?q=${encodeURIComponent(query)}`;
+
+        let response;
+        try {
+            response = await fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                signal: this.abortController.signal,
+            });
+        } catch {
+            return; // aborted by a newer keystroke
+        }
 
         if (!response.ok) {
             return;
         }
 
         this.resultsTarget.innerHTML = await response.text();
-        window.history.replaceState(null, '', url.toString());
+        window.history.replaceState(null, '', url);
     }
 }

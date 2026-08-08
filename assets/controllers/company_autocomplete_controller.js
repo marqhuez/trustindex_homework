@@ -1,19 +1,20 @@
 import { Controller } from '@hotwired/stimulus';
+import debounce from '../utils/debounce.js';
 
 export default class extends Controller {
     static targets = ['input', 'results', 'option'];
     static values = { url: String };
 
     connect() {
-        this.debounceTimer = null;
         this.activeIndex = -1;
         this.boundHandleOutsideClick = this.handleOutsideClick.bind(this);
         document.addEventListener('click', this.boundHandleOutsideClick);
+        this.debouncedFetch = debounce((query) => this.fetchResults(query), 200);
     }
 
     disconnect() {
         document.removeEventListener('click', this.boundHandleOutsideClick);
-        clearTimeout(this.debounceTimer);
+        this.debouncedFetch.cancel();
     }
 
     handleOutsideClick(event) {
@@ -23,15 +24,15 @@ export default class extends Controller {
     }
 
     search() {
-        clearTimeout(this.debounceTimer);
         const query = this.inputTarget.value.trim();
 
         if (query.length < 1) {
+            this.debouncedFetch.cancel();
             this.close();
             return;
         }
 
-        this.debounceTimer = setTimeout(() => this.fetchResults(query), 200);
+        this.debouncedFetch(query);
     }
 
     async fetchResults(query) {

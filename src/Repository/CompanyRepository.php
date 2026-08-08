@@ -28,7 +28,7 @@ class CompanyRepository extends ServiceEntityRepository
             ->groupBy('c.id')
             ->orderBy('AVG(r.rating)', 'DESC');
 
-        if ($search !== null && $search !== '') {
+        if ($search !== null) {
             $queryBuilder
                 ->andWhere('LOWER(c.name) LIKE LOWER(:search)')
                 ->setParameter('search', '%' . $search . '%');
