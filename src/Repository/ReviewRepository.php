@@ -16,6 +16,19 @@ class ReviewRepository extends ServiceEntityRepository
         parent::__construct($registry, Review::class);
     }
 
+    public function findPageNewestFirst(int $offset, int $limit): array
+    {
+        return $this->createQueryBuilder('r')
+            ->addSelect('c')
+            ->join('r.company', 'c')
+            ->orderBy('r.createdAt', 'DESC')
+            ->addOrderBy('r.id', 'DESC') // second order by, to ensure consistent ordering when createdAt is the same
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Review[] Returns an array of Review objects
     //     */
