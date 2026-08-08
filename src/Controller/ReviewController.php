@@ -18,6 +18,8 @@ final class ReviewController extends AbstractController
     #[Route('/', name: 'app_review_index')]
     public function index(Request $request, ReviewRepository $reviewRepository): Response
     {
+        // pagination logic kept in the controller since it's the only consumer.
+        // if an API endpoint or console command needed the same listing, this would move into ReviewRepository (e.g. returning a PaginatedResult) to avoid duplication
         $limit = 10;
         $totalPages = max(1, (int) ceil($reviewRepository->count([]) / $limit));
 
