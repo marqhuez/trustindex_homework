@@ -13,13 +13,20 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CompanyController extends AbstractController
 {
     #[Route('/companies', name: 'app_company')]
-    public function index(CompanyRepository $companyRepository): Response
+    public function index(Request $request, CompanyRepository $companyRepository): Response
     {
-        $stats = $companyRepository->findAllWithReviewStats();
+        $search = trim($request->query->get('q', ''));
+        $context = [
+            'stats' => $companyRepository->findAllWithReviewStats($search !== '' ? $search : null),
+            'search' => $search,
+        ];
 
-        return $this->render('company/index.html.twig', [
-            'stats' => $stats,
-        ]);
+        // live search fetches this same route with X-Requested-With set — render just the results fragment so the JS can swap it in without a full page reload
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('company/_results.html.twig', $context);
+        }
+
+        return $this->render('company/index.html.twig', $context);
     }
 
     #[Route('/companies/search', name: 'app_company_search', methods: ['GET'])]
@@ -32,7 +39,7 @@ final class CompanyController extends AbstractController
         }
 
         return $this->json(array_map(
-            static fn (Company $company) => ['id' => $company->getId(), 'name' => $company->getName()],
+            static fn(Company $company) => ['id' => $company->getId(), 'name' => $company->getName()],
             $companyRepository->search($query),
         ));
     }

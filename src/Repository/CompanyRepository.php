@@ -20,15 +20,21 @@ class CompanyRepository extends ServiceEntityRepository
     /**
      * @return CompanyStats[]
      */
-    public function findAllWithReviewStats(): array
+    public function findAllWithReviewStats(?string $search = null): array
     {
-        return $this->createQueryBuilder('c')
+        $queryBuilder = $this->createQueryBuilder('c')
             ->select(sprintf('NEW %s(c, COUNT(r.id), AVG(r.rating))', CompanyStats::class))
             ->leftJoin('c.reviews', 'r')
             ->groupBy('c.id')
-            ->orderBy('AVG(r.rating)', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('AVG(r.rating)', 'DESC');
+
+        if ($search !== null && $search !== '') {
+            $queryBuilder
+                ->andWhere('LOWER(c.name) LIKE LOWER(:search)')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function findOneByNameIgnoreCase(string $name): ?Company
