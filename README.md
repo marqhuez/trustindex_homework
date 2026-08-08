@@ -87,7 +87,7 @@ vendor/bin/php-cs-fixer fix                    # fix
 
 ## Architecture notes
 
-- The assignment expects the company-stats aggregation method to live in `ReviewRepository`. Since the solution — for a more realistic data model than the one implied by the spec — includes a separate `Company` entity and `CompanyRepository`, this method (`findAllWithReviewStats()`) lives in `CompanyRepository` instead: the query's root (`SELECT ... FROM Company c LEFT JOIN c.reviews r`) is also `Company`, so that's where it belongs per the Doctrine repository pattern too.
+- The assignment expects the company-stats aggregation method to live in `ReviewRepository`. Since the solution — for a more realistic data model than the one implied by the spec — includes a separate `Company` entity and `CompanyRepository`, this method (`findAllWithReviewStats()`) lives in `CompanyRepository` instead.
 - The `Review` entity's validation constraints (`#[Assert\*]`) are currently not the only validation path — the `/reviews/new` form validates a separate DTO (`CreateReviewRequest`) instead, because resolving the `company` field (existing company or creating a new one) can only happen *after* validation. The constraints left on the entity document what a valid state looks like, and also protect any future non-form entry point (e.g. an API).
 - The separate `Company` entity introduces a design question that wouldn't exist if `Review` just had a plain `companyName` string field: what happens when someone types a company name that doesn't exist yet? `CompanyResolver::findOrCreateByName()` exists specifically to preserve the behavior a single-entity design would have had for free — a case-insensitive match reuses the existing `Company`, and no match transparently creates a new one. From the review-submission form's point of view, typing any company name always works, exactly as if `company` were still just a string on `Review`.
 
@@ -96,15 +96,15 @@ vendor/bin/php-cs-fixer fix                    # fix
 | Task | Time |
 |---|---|
 | Project setup — Symfony skeleton, webapp packages, Docker (MySQL) | ~0.5 h |
-| **§1 Data model** — `Review`/`Company` entities, Doctrine attribute mapping, validation constraints, first migration | ~0.5 h |
-| **§2.1 New review submission** — `ReviewType` form, validation rules, flash message, flash toast component | ~1 h |
-| **§2.2 Review listing** — homepage, pagination, page selector | ~0.5 h |
-| **§2.3 Review detail page** — route + controller action, star-rating component (with partial fill) | ~0.5 h |
-| **§3 Tech requirements** — Tailwind design system, unified `base.html.twig` layout | ~0.5 h |
-| **§2.4 Company stats** — `/companies` page, `findAllWithReviewStats()`, sorted by average rating descending | ~0.5 h |
-| **§2.1 (cont.)** — company name search/autocomplete on the review form, find-or-create logic (`CompanyResolver`) | ~0.5 h |
-| **§2.5 Search by company name (bonus)** — live, debounced search on `/companies` | ~0.5 h |
-| **§2.6 Extra** — spam/quality filter (`ReviewSpamDetector`), moderation `flagged` field | ~0.5 h |
-| **§4 Testing** — PHPUnit functional + unit tests (average calculation and sorting logic covered), introduced `php-cs-fixer`, final review pass | ~1.0 h |
+| **1 Data model** — `Review`/`Company` entities, Doctrine attribute mapping, validation constraints, first migration | ~0.5 h |
+| **2.1 New review submission** — `ReviewType` form, validation rules, flash message, flash toast component | ~1 h |
+| **2.2 Review listing** — homepage, pagination, page selector | ~0.5 h |
+| **2.3 Review detail page** — route + controller action, star-rating component (with partial fill) | ~0.5 h |
+| **3 Tech requirements** — Tailwind design system, unified `base.html.twig` layout | ~0.5 h |
+| **2.4 Company stats** — `/companies` page, `findAllWithReviewStats()`, sorted by average rating descending | ~0.5 h |
+| **2.1 (cont.)** — company name search/autocomplete on the review form, find-or-create logic (`CompanyResolver`) | ~0.5 h |
+| **2.5 Search by company name (bonus)** — live, debounced search on `/companies` | ~0.5 h |
+| **2.6 Extra** — spam/quality filter (`ReviewSpamDetector`), moderation `flagged` field | ~0.5 h |
+| **4 Testing** — PHPUnit functional + unit tests (average calculation and sorting logic covered), introduced `php-cs-fixer`, final review pass | ~1.0 h |
 
 **Total: ~6.5 hours** (over the estimated 4–6 hours — due to the bonus features (search, extra spam filter) and broader test coverage).
