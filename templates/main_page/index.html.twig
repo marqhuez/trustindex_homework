@@ -24,25 +24,39 @@
         </ul>
 
         {% if totalPages > 1 %}
-            <nav class="mt-10 flex items-center justify-between" aria-label="Pagination">
+            <nav class="mt-10 flex items-center justify-center gap-1.5" aria-label="Pagination">
                 {% if page > 1 %}
                     <a href="{{ path('app_main_page', { page: page - 1 }) }}"
-                       class="rounded-full border border-paper-deep px-5 py-2 text-sm font-medium text-ink transition-colors hover:border-emerald hover:text-emerald">
-                        Previous
-                    </a>
+                       class="flex h-9 w-9 items-center justify-center rounded-full border border-paper-deep text-ink transition-colors hover:border-emerald hover:text-emerald"
+                       aria-label="Previous page">‹</a>
                 {% else %}
-                    <span class="rounded-full border border-paper-deep px-5 py-2 text-sm font-medium text-ink-soft/40">Previous</span>
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full border border-paper-deep text-ink-soft/40">‹</span>
                 {% endif %}
 
-                <span class="font-mono text-xs tracking-widest text-ink-soft uppercase">Page {{ page }} of {{ totalPages }}</span>
+                {% for p in 1..totalPages %}
+                    {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+                        {% if p == page %}
+                            <span aria-current="page"
+                                  class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald text-sm font-medium text-paper">
+                                {{ p }}
+                            </span>
+                        {% else %}
+                            <a href="{{ path('app_main_page', { page: p }) }}"
+                               class="flex h-9 w-9 items-center justify-center rounded-full border border-paper-deep text-sm font-medium text-ink transition-colors hover:border-emerald hover:text-emerald">
+                                {{ p }}
+                            </a>
+                        {% endif %}
+                    {% elseif p == page - 3 or p == page + 3 %}
+                        <span class="flex h-9 w-9 items-center justify-center text-sm text-ink-soft/40">…</span>
+                    {% endif %}
+                {% endfor %}
 
                 {% if page < totalPages %}
                     <a href="{{ path('app_main_page', { page: page + 1 }) }}"
-                       class="rounded-full border border-paper-deep px-5 py-2 text-sm font-medium text-ink transition-colors hover:border-emerald hover:text-emerald">
-                        Next
-                    </a>
+                       class="flex h-9 w-9 items-center justify-center rounded-full border border-paper-deep text-ink transition-colors hover:border-emerald hover:text-emerald"
+                       aria-label="Next page">›</a>
                 {% else %}
-                    <span class="rounded-full border border-paper-deep px-5 py-2 text-sm font-medium text-ink-soft/40">Next</span>
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full border border-paper-deep text-ink-soft/40">›</span>
                 {% endif %}
             </nav>
         {% endif %}
