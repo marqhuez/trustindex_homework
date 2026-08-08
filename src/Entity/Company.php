@@ -56,26 +56,4 @@ class Company
     {
         return $this->reviews;
     }
-
-    public function addReview(Review $review): static
-    {
-        if (!$this->reviews->contains($review)) {
-            $this->reviews->add($review);
-            $review->setCompany($this);
-        }
-
-        return $this;
-    }
-
-    public function removeReview(Review $review): static
-    {
-        if ($this->reviews->removeElement($review)) {
-            // set the owning side to null (unless already changed)
-            if ($review->getCompany() === $this) {
-                $review->setCompany(null);
-            }
-        }
-
-        return $this;
-    }
 }
