@@ -71,6 +71,13 @@ symfony serve
 php -S localhost:8000 -t public
 ```
 
+Changing `APP_ENV` may require running these two commands, so assets load properly:
+
+```bash
+php bin/console cache:clear --env=prod
+php bin/console asset-map:compile --env=prod
+```
+
 ## Tests
 
 The test environment uses a separate, SQLite-based database (`.env.test`), so running the tests doesn't require the MySQL container. Before running the tests for the first time, create the test schema:
