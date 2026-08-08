@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Review;
 use App\Form\ReviewType;
+use App\Repository\ReviewRepository;
 use App\Service\ReviewService;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,8 +15,26 @@ use Throwable;
 
 final class ReviewController extends AbstractController
 {
-    #[Route('/review', name: 'app_review')]
-    public function index(Request $request, ReviewService $reviewService, LoggerInterface $logger): Response
+    #[Route('/', name: 'app_review_index')]
+    public function index(Request $request, ReviewRepository $reviewRepository): Response
+    {
+        $limit = 10;
+        $totalPages = max(1, (int) ceil($reviewRepository->count([]) / $limit));
+
+        $page = $request->query->getInt('page', 1);
+        $page = max(1, min($page, $totalPages));
+
+        $reviews = $reviewRepository->findPageNewestFirst($limit, offset: ($page - 1) * $limit);
+
+        return $this->render('review/index.html.twig', [
+            'reviews' => $reviews,
+            'page' => $page,
+            'totalPages' => $totalPages,
+        ]);
+    }
+
+    #[Route('/reviews/new', name: 'app_review_new')]
+    public function new(Request $request, ReviewService $reviewService, LoggerInterface $logger): Response
     {
         $review = new Review();
 
@@ -27,14 +46,14 @@ final class ReviewController extends AbstractController
                 $reviewService->saveNew($review);
                 $this->addFlash('success', 'Review submitted successfully!');
 
-                return $this->redirectToRoute('app_main_page');
+                return $this->redirectToRoute('app_review_index');
             } catch (Throwable $e) {
                 $logger->error('Error saving review: ' . $e->getMessage());
                 $this->addFlash('error', 'An error occurred while saving the review');
             }
         }
 
-        return $this->render('review/index.html.twig', [
+        return $this->render('review/new.html.twig', [
             'form' => $form,
         ]);
     }
