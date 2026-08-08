@@ -2,14 +2,13 @@
 
 namespace App\Form;
 
-use App\Entity\Company;
-use App\Entity\Review;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Form\Dto\CreateReviewRequest;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -30,10 +29,8 @@ class ReviewType extends AbstractType
             ->add('authorEmail', EmailType::class, [
                 'label' => 'Email',
             ])
-            ->add('company', EntityType::class, [
-                'class' => Company::class,
-                'choice_label' => 'name',
-                'placeholder' => 'Choose a company',
+            ->add('companyName', TextType::class, [
+                'label' => 'Company',
             ])
             ->add('submit', SubmitType::class, [
                 'label' => 'Submit Review',
@@ -44,7 +41,7 @@ class ReviewType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Review::class,
+            'data_class' => CreateReviewRequest::class,
         ]);
     }
 }

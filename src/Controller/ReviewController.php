@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Review;
+use App\Form\Dto\CreateReviewRequest;
 use App\Form\ReviewType;
 use App\Repository\CompanyRepository;
 use App\Repository\ReviewRepository;
@@ -37,21 +38,29 @@ final class ReviewController extends AbstractController
     }
 
     #[Route('/reviews/new', name: 'app_review_new')]
-    public function new(Request $request, ReviewService $reviewService, CompanyRepository $companyRepository, LoggerInterface $logger): Response
-    {
-        $review = new Review();
+    public function new(
+        Request $request,
+        ReviewService $reviewService,
+        CompanyRepository $companyRepository,
+        LoggerInterface $logger,
+    ): Response {
+        $dto = new CreateReviewRequest();
 
         $companyId = $request->query->getInt('company');
         if ($companyId > 0) {
-            $review->setCompany($companyRepository->find($companyId));
+            $company = $companyRepository->find($companyId);
+            if ($company !== null) {
+                $dto->companyName = $company->getName();
+            }
         }
 
-        $form = $this->createForm(ReviewType::class, $review);
+        $form = $this->createForm(ReviewType::class, $dto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                $reviewService->saveNew($review);
+                $reviewService->saveNew($reviewService->createFromRequest($dto));
+
                 $this->addFlash('success', 'Review submitted successfully!');
 
                 return $this->redirectToRoute('app_review_index');
@@ -69,9 +78,11 @@ final class ReviewController extends AbstractController
     #[Route('/reviews/{id}', name: 'app_review_show', requirements: ['id' => '\d+'])]
     public function show(Review $review, Request $request): Response
     {
+        $fromPage = max(1, $request->query->getInt('fromPage', 1));
+
         return $this->render('review/show.html.twig', [
             'review' => $review,
-            'fromPage' => $request->query->get('fromPage'),
+            'fromPage' => $fromPage,
         ]);
     }
 }

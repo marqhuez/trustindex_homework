@@ -67,21 +67,38 @@
                 {{ form_errors(form.authorEmail) }}
             </div>
 
-            <div>
-                <label for="{{ form.company.vars.id }}" class="font-mono text-xs tracking-widest text-ink-soft uppercase">
+            <div data-controller="company-autocomplete"
+                 data-company-autocomplete-url-value="{{ path('app_company_search') }}"
+                 class="relative">
+                <label for="{{ form.companyName.vars.id }}" class="font-mono text-xs tracking-widest text-ink-soft uppercase">
                     Company
                 </label>
                 <div class="relative mt-2">
-                    {{ form_widget(form.company, {
+                    {{ form_widget(form.companyName, {
                         attr: {
-                            class: 'block w-full appearance-none rounded-lg border border-paper-deep bg-paper px-4 py-2.5 pr-10 text-sm text-ink focus:border-emerald focus:ring-1 focus:ring-emerald focus:outline-none'
+                            class: 'block w-full rounded-lg border border-paper-deep bg-paper px-4 py-2.5 pr-10 text-sm text-ink placeholder:text-ink-soft/60 focus:border-emerald focus:ring-1 focus:ring-emerald focus:outline-none',
+                            placeholder: 'Start typing a company name…',
+                            autocomplete: 'off',
+                            role: 'combobox',
+                            'aria-expanded': 'false',
+                            'aria-autocomplete': 'list',
+                            'data-company-autocomplete-target': 'input',
+                            'data-action': 'input->company-autocomplete#search keydown->company-autocomplete#keydown'
                         }
                     }) }}
                     <svg viewBox="0 0 24 24" class="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M6 9l6 6 6-6"/>
+                        <circle cx="11" cy="11" r="7"/>
+                        <path d="M21 21l-4.35-4.35"/>
                     </svg>
                 </div>
-                {{ form_errors(form.company) }}
+                <ul data-company-autocomplete-target="results"
+                    role="listbox"
+                    class="absolute z-10 mt-1 hidden max-h-48 w-full overflow-auto rounded-lg border border-paper-deep bg-white py-1 shadow-sm shadow-ink/5">
+                </ul>
+                <p class="mt-2 text-xs text-ink-soft/70">
+                    Pick a match from the list, or keep typing to add a new company.
+                </p>
+                {{ form_errors(form.companyName) }}
             </div>
         </div>
 

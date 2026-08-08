@@ -30,4 +30,27 @@ class CompanyRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findOneByNameIgnoreCase(string $name): ?Company
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('LOWER(c.name) = LOWER(:name)')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * @return Company[]
+     */
+    public function search(string $query, int $limit = 8): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('LOWER(c.name) LIKE LOWER(:query)')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('c.name', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }
