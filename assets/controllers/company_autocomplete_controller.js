@@ -7,6 +7,7 @@ export default class extends Controller {
 
     connect() {
         this.activeIndex = -1;
+        this.abortController = null;
         this.boundHandleOutsideClick = this.handleOutsideClick.bind(this);
         document.addEventListener('click', this.boundHandleOutsideClick);
         this.debouncedFetch = debounce((query) => this.fetchResults(query), 200);
@@ -15,6 +16,7 @@ export default class extends Controller {
     disconnect() {
         document.removeEventListener('click', this.boundHandleOutsideClick);
         this.debouncedFetch.cancel();
+        this.abortController?.abort();
     }
 
     handleOutsideClick(event) {
@@ -36,9 +38,18 @@ export default class extends Controller {
     }
 
     async fetchResults(query) {
-        const response = await fetch(`${this.urlValue}?q=${encodeURIComponent(query)}`, {
-            headers: { Accept: 'application/json' },
-        });
+        this.abortController?.abort();
+        this.abortController = new AbortController();
+
+        let response;
+        try {
+            response = await fetch(`${this.urlValue}?q=${encodeURIComponent(query)}`, {
+                headers: { Accept: 'application/json' },
+                signal: this.abortController.signal,
+            });
+        } catch {
+            return; // aborted by a newer keystroke
+        }
 
         if (!response.ok) {
             this.close();
