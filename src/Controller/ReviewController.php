@@ -57,4 +57,12 @@ final class ReviewController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/reviews/{id}', name: 'app_review_show', requirements: ['id' => '\d+'])]
+    public function show(Review $review): Response
+    {
+        return $this->render('review/show.html.twig', [
+            'review' => $review,
+        ]);
+    }
 }

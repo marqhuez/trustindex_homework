@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ review.company.name }} · Trustindex{% endblock %}
+
+{% block body %}
+<main class="mx-auto max-w-3xl px-6 py-10">
+    <a href="{{ path('app_review_index') }}"
+       class="inline-flex items-center gap-2 font-mono text-xs tracking-widest text-ink-soft uppercase transition-colors hover:text-emerald">
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6"/>
+        </svg>
+        Back to reviews
+    </a>
+
+    <p class="mt-8 font-mono text-xs tracking-widest text-emerald uppercase">Review</p>
+    <h1 class="mt-3 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+        {{ review.company.name }}
+    </h1>
+
+    <div class="mt-10 rounded-2xl border border-paper-deep bg-white p-8 shadow-sm shadow-ink/5">
+        <div class="flex items-center justify-between gap-4">
+            {{ include('review/_stars.html.twig', { rating: review.rating }) }}
+            <time datetime="{{ review.createdAt|date('c') }}" class="font-mono text-xs tracking-widest text-ink-soft/70 uppercase">
+                {{ review.createdAt|date('Y.m.d.') }}
+            </time>
+        </div>
+
+        <p class="mt-6 text-sm leading-relaxed whitespace-pre-line text-ink-soft">
+            {{ review.reviewText }}
+        </p>
+    </div>
+</main>
+{% endblock %}
